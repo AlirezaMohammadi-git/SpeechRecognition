@@ -6,16 +6,28 @@
     <link rel="icon" href="https://fav.farm/🔥" />
   </head>
   <body>
-    <button data-id="start">start SpeechRecognition</button>
-    <button data-id="stop">stop SpeechRecognition</button>
+    <h1>
+      This feature doesn't work on Firefox and some other browsers.<br /><span
+        class="reference"
+      >
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition#browser_compatibility"
+          target="_blank"
+          >Reference</a
+        >
+      </span>
+    </h1>
+    <div class="btn-contaienr">
+      <button data-id="start">start SpeechRecognition</button>
+      <button data-id="stop">stop SpeechRecognition</button>
+    </div>
+
     <div class="words" contenteditable></div>
 
     <script>
-       
       window.SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
-      
-        
+
       const recognition = new SpeechRecognition();
       recognition.interimResults = true;
       recognition.lang = "en-US";
@@ -24,7 +36,7 @@
       btns.forEach((btn) =>
         btn.addEventListener(
           "click",
-          btn.dataset.id === 'start'
+          btn.dataset.id === "start"
             ? startSpeechRecognition()
             : stopSpeechRecognition()
         )
@@ -50,14 +62,14 @@
           }
         });
 
-        recognition.addEventListener("end", recognition.start );
+        recognition.addEventListener("end", recognition.start);
 
         recognition.start();
       }
 
       function stopSpeechRecognition() {
-        recognition.removeEventListener('end' , recognition.abort )
-        recognition.stop()
+        recognition.removeEventListener("end", recognition.abort);
+        recognition.stop();
       }
     </script>
 
@@ -71,6 +83,12 @@
         font-family: "helvetica neue";
         font-weight: 200;
         font-size: 20px;
+      }
+
+      h1 {
+        width: 100%;
+        text-align: center;
+        color: black;
       }
 
       .words {
@@ -106,6 +124,17 @@
         bottom: 0;
         border: 1px solid;
         border-color: transparent #efe4e4;
+      }
+
+      .btn-contaienr {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 22px;
+        align-items: center;
+      }
+      .reference {
+        font-size: 2rem;
       }
     </style>
   </body>
