@@ -32,51 +32,77 @@
         new SpeechRecognition() || new webkitSpeechRecognition();
       recognition.interimResults = true;
       recognition.lang = "en-US";
+
+      let onResultListener;
+      let onEndListener;
       let isRunning = false;
+      let currentParagragh;
 
       const btns = document.querySelectorAll("button[data-id]");
       btns.forEach((btn) =>
         btn.addEventListener(
           "click",
           btn.dataset.id === "start"
-            ? () => startSpeechRecognition()
+            ? () => {
+                if (!isRunning) {
+                  startSpeechRecognition();
+                }
+              }
             : () => stopSpeechRecognition()
         )
       );
 
       function startSpeechRecognition() {
-        if (isRunning) return;
-        isRunning = true;
+        if (isRunning) {
+          return;
+        } else {
+          isRunning = true;
+          currentParagragh = document.createElement("p");
+          const words = document.querySelector(".words");
+          words.appendChild(currentParagragh);
 
-        let p = document.createElement("p");
-        const words = document.querySelector(".words");
-        words.appendChild(p);
-
-        recognition.addEventListener("result", (e) => {
-          const transcript = Array.from(e.results)
-            .map((result) => result[0])
-            .map((result) => result.transcript)
-            .join("");
-
-          const poopScript = transcript.replace(/poop|poo|shit|dump/gi, "💩");
-          p.textContent = poopScript;
-
-          if (e.results[0].isFinal) {
-            p = document.createElement("p");
-            words.appendChild(p);
+          //remove old listeners if any (to avoide duplicate results)
+          if (onResultListener) {
+            recognition.removeEventListener("result", onResultListener);
           }
-        });
+          if (onEndListener) {
+            recognition.removeEventListener("end", onEndListener);
+          }
 
-        recognition.addEventListener("end", () => {
-          if (isRunning) recognition.start();
-        });
+          // defining new listeners
+          onResultListener = (e) => {
+            const transcript = Array.from(e.results)
+              .map((result) => result[0])
+              .map((result) => result.transcript)
+              .join("");
 
-        recognition.start();
+            const poopScript = transcript.replace(/poop|poo|shit|dump/gi, "💩");
+            currentParagragh.textContent = poopScript;
+
+            if (e.results[0].isFinal) {
+              currentParagragh = document.createElement("p");
+              words.appendChild(currentParagragh);
+            }
+          };
+
+          onEndListener = () => {
+            if (isRunning) {
+              recognition.start();
+            }
+          };
+
+          // adding new listeners
+          recognition.addEventListener("result", onResultListener);
+          recognition.addEventListener("end", onEndListener);
+
+          recognition.start();
+        }
       }
 
       function stopSpeechRecognition() {
         isRunning = false;
-        recognition.removeEventListener("end", recognition.start);
+        recognition.removeEventListener("result", onResultListener);
+        recognition.removeEventListener("end", onEndListener);
         recognition.stop();
       }
     </script>
