@@ -28,21 +28,26 @@
       window.SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
 
-      const recognition = new SpeechRecognition();
+      const recognition =
+        new SpeechRecognition() || new webkitSpeechRecognition();
       recognition.interimResults = true;
       recognition.lang = "en-US";
+      let isRunning = false;
 
       const btns = document.querySelectorAll("button[data-id]");
       btns.forEach((btn) =>
         btn.addEventListener(
           "click",
           btn.dataset.id === "start"
-            ? startSpeechRecognition()
-            : stopSpeechRecognition()
+            ? () => startSpeechRecognition()
+            : () => stopSpeechRecognition()
         )
       );
 
       function startSpeechRecognition() {
+        if (isRunning) return;
+        isRunning = true;
+
         let p = document.createElement("p");
         const words = document.querySelector(".words");
         words.appendChild(p);
@@ -62,13 +67,16 @@
           }
         });
 
-        recognition.addEventListener("end", recognition.start);
+        recognition.addEventListener("end", () => {
+          if (isRunning) recognition.start();
+        });
 
         recognition.start();
       }
 
       function stopSpeechRecognition() {
-        recognition.removeEventListener("end", recognition.abort);
+        isRunning = false;
+        recognition.removeEventListener("end", recognition.start);
         recognition.stop();
       }
     </script>
